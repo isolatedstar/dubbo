@@ -154,6 +154,7 @@ public abstract class AbstractClusterInvoker<T> implements ClusterInvoker<T> {
         if (CollectionUtils.isEmpty(invokers)) {
             return null;
         }
+        // 方法名
         String methodName = invocation == null ? StringUtils.EMPTY_STRING : invocation.getMethodName();
 
         boolean sticky = invokers.get(0).getUrl()

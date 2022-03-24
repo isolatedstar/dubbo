@@ -52,20 +52,17 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
         super(directory);
     }
 
-    /**
-     *
-     * @date 2022/3/24
-     * @param invocation
-     * @param invokers
-     * @param loadbalance
-     * @return org.apache.dubbo.rpc.Result
-     */
+
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Result doInvoke(Invocation invocation, final List<Invoker<T>> invokers, LoadBalance loadbalance) throws RpcException {
+        // 复制一份
         List<Invoker<T>> copyInvokers = invokers;
+        // 检查copyInvokers是否为空，如果为空则抛出异常
         checkInvokers(copyInvokers, invocation);
+        // 获取方法的信息
         String methodName = RpcUtils.getMethodName(invocation);
+        // 计算调用次数，如果不设置默认是3次
         int len = calculateInvokeTimes(methodName);
         // retry loop.
         RpcException le = null; // last exception.
@@ -74,9 +71,10 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
         for (int i = 0; i < len; i++) {
             //Reselect before retry to avoid a change of candidate `invokers`.
             //NOTE: if `invokers` changed, then `invoked` also lose accuracy.
+            // 第一次调用失败，进行重试
             if (i > 0) {
                 checkWhetherDestroyed();
-                copyInvokers = list(invocation);
+                copyInvokers = list (invocation);
                 // check again
                 checkInvokers(copyInvokers, invocation);
             }
